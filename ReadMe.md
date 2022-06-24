@@ -4,6 +4,8 @@ Practice tool for encrypting-decrypting plain text data with go language.
 Build using following command:
 
 ```bash
+git clone https://github.com/satindergrewal/aes
+go mod tidy
 go build
 ```
 
@@ -24,6 +26,10 @@ Extra tools which can be used:
 
 - qrencode
 - zbar-tools
+
+```bash
+brew install qrencode zbar
+```
 
 Encoding QR-Code to an image:
 
