@@ -60,3 +60,14 @@ Executing it with bash will output decrypted text:
 $ bash test.sh
 decrypted: world
 ```
+
+Building for cross platform:
+
+```bash
+mkdir -p build/{linux,mac}/{amd64,arm64}
+GOOS=linux GOARCH=amd64 go build -o build/linux/amd64/aes
+GOOS=linux GOARCH=arm64 go build -o build/linux/arm64/aes
+GOOS=darwin GOARCH=amd64 go build -o build/mac/amd64/aes
+GOOS=darwin GOARCH=arm64 go build -o build/mac/arm64/aes
+tar cvf aes.tar.gz build
+```
