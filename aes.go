@@ -51,16 +51,23 @@ func main() {
 	key1 := flag.String("key1", "", "passphrase key part 1")
 	key2 := flag.String("key2", "", "passphrase key part 2")
 	c := flag.String("c", "", "ciphertext")
+	e := flag.Bool("e", false, "If defined it'll encryption output. Rmeove this flag for getting decryption output.")
 	flag.Parse()
 	// fmt.Println("key1:", *key1)
 	// fmt.Println("key2:", *key2)
 	// fmt.Println("c:", *c)
+	// fmt.Println(*e)
 	finalKey := *key1 + *key2
 	// fmt.Println(finalKey)
-	d := decrypt(finalKey, *c)
-	if d != "" {
-		fmt.Println("decrypted:", d)
+	if *e {
+		t := encrypt(finalKey, *c)
+		fmt.Println("enrypted:", t)
 	} else {
-		fmt.Println("decryption failed: empty response. check keys.")
+		d := decrypt(finalKey, *c)
+		if d != "" {
+			fmt.Println("decrypted:", d)
+		} else {
+			fmt.Println("decryption failed: empty response. check keys.")
+		}
 	}
 }
