@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Go WASM Encryption/Decryption</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 10px 20px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+        #output {
+            margin-top: 15px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+    <h1>Go WASM Encryption/Decryption Tool</h1>
+    
+    <div class="input-group">
+        <label for="key1">Key Part 1 (Required):</label>
+        <input type="text" id="key1" placeholder="Enter first part of key">
+    </div>
+
+    <div class="input-group">
+        <label for="key2">Key Part 2 (Optional):</label>
+        <input type="text" id="key2" placeholder="Enter second part of key (optional)">
+    </div>
+
+    <div class="input-group">
+        <label for="text">Text to Process:</label>
+        <textarea id="text" rows="4" placeholder="Enter text to encrypt or ciphertext to decrypt"></textarea>
+    </div>
+
+    <button onclick="encryptText()">Encrypt</button>
+    <button onclick="decryptText()">Decrypt</button>
+
+    <div id="output"></div>
+
+    <script src="wasm_exec.js"></script>
+    <script>
+        // Load and instantiate the WASM module
+        const go = new Go();
+        WebAssembly.instantiateStreaming(fetch("crypto.wasm"), go.importObject)
+            .then((result) => {
+                go.run(result.instance);
+                document.getElementById("output").textContent = "WASM module loaded successfully";
+            })
+            .catch((err) => {
+                document.getElementById("output").textContent = `Error loading WASM: ${err}`;
+            });
+
+        function encryptText() {
+            const key1 = document.getElementById("key1").value;
+            const key2 = document.getElementById("key2").value;
+            const text = document.getElementById("text").value;
+            const output = document.getElementById("output");
+
+            if (!key1 || !text) {
+                output.textContent = "Please fill required fields: Key Part 1 and Text";
+                return;
+            }
+
+            const passphrase = key1 + (key2 || "");
+            try {
+                const result = goEncrypt(passphrase, text);
+                output.textContent = `Encrypted: ${result}`;
+            } catch (error) {
+                output.textContent = `Encryption failed: ${error}`;
+            }
+        }
+
+        function decryptText() {
+            const key1 = document.getElementById("key1").value;
+            const key2 = document.getElementById("key2").value;
+            const text = document.getElementById("text").value;
+            const output = document.getElementById("output");
+
+            if (!key1 || !text) {
+                output.textContent = "Please fill required fields: Key Part 1 and Text";
+                return;
+            }
+
+            const passphrase = key1 + (key2 || "");
+            try {
+                const result = goDecrypt(passphrase, text);
+                output.textContent = result.startsWith("Decryption failed") 
+                    ? result 
+                    : `Decrypted: ${result}`;
+            } catch (error) {
+                output.textContent = `Decryption failed: ${error}`;
+            }
+        }
+    </script>
+</body>
+</html>

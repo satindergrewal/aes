@@ -1,5 +1,5 @@
-module github.com/satindergrewal/aes
+module aes-wasm
 
-go 1.18
+go 1.24.0
 
-require golang.org/x/crypto v0.0.0-20220622213112-05595931fe9d
+require golang.org/x/crypto v0.35.0
