@@ -5,69 +5,55 @@ Build using following command:
 
 ```bash
 git clone https://github.com/satindergrewal/aes
+git checkout wasm
 go mod tidy
-go build
+GOOS=js GOARCH=wasm go build -o crypto.wasm main.go
 ```
 
-Command help:
+`wasm_exec.js` file is already included with this code, but if needed find it with the latest updates from local Go install using following instructions:
 
-```bash
-./aes -h
-Usage of ./aes:
-  -c string
-    	ciphertext
-  -key1 string
-    	passphrase key part 1
-  -key2 string
-    	passphrase key part 2
+Find GOROOT:
+
+```
+go env GOROOT
 ```
 
-Extra tools which can be used:
+Use that path to find wasm_exec.js file, example:
 
-- qrencode
-- zbar-tools
-
-```bash
-brew install qrencode zbar
+```
+find /opt/homebrew/Cellar/go/1.24.0/libexec -name "wasm_exec.js"
 ```
 
-Encoding QR-Code to an image:
+When found copy that to replace the existing file in the code.
 
-```bash
-qrencode -s 6 -l H -o "q.png" "c2932347953ad4a4-25f496d260de9c150fc9e4c6-20bc1f8439796cc914eb783b9996a8d9c32d45e2df"
+To run it locally can use either Python to serve the page on localhost address:
+
+```
+python3 -m http.server 8080
 ```
 
-Decoding QR-Code to text:
+
+For testing use this data:
+
+
+To encrypt:
 
 ```bash
-$ zbarimg -q --raw q.png
+key 1 = hello
+key 2 = 
+Text = world
+
+# OUTPUT:
 c2932347953ad4a4-25f496d260de9c150fc9e4c6-20bc1f8439796cc914eb783b9996a8d9c32d45e2df
 ```
 
-Can use a bash shell script to pass arguments to command line by reading input from QR code image with following example bash code:
+To decrypt:
 
 ```bash
-# test.sh
-export k1="hello"
-export k2=""
-export c=$(zbarimg -q --raw q.png)
-./aes -key1 "$k1" -key2 "$k2" -c "$c"
-```
+key 1 = hello
+key 2 =
+Text = c2932347953ad4a4-25f496d260de9c150fc9e4c6-20bc1f8439796cc914eb783b9996a8d9c32d45e2df
 
-Executing it with bash will output decrypted text:
-
-```bash
-$ bash test.sh
-decrypted: world
-```
-
-Building for cross platform:
-
-```bash
-mkdir -p build/{linux,mac}/{amd64,arm64}
-GOOS=linux GOARCH=amd64 go build -o build/linux/amd64/aes
-GOOS=linux GOARCH=arm64 go build -o build/linux/arm64/aes
-GOOS=darwin GOARCH=amd64 go build -o build/mac/amd64/aes
-GOOS=darwin GOARCH=arm64 go build -o build/mac/arm64/aes
-tar cvf aes.tar.gz build
+# OUTPUT:
+world
 ```
